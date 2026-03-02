@@ -1,37 +1,96 @@
 import 'package:expense_tracker/constant/app_colors.dart';
+import 'package:expense_tracker/constant/responsive.dart';
 import 'package:expense_tracker/presentation/home/home_viewmodel.dart';
+import 'package:expense_tracker/utils/date_month_piker.dart';
+import 'package:expense_tracker/widgets/base_scaffold.dart';
 import 'package:expense_tracker/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class HomeView extends ConsumerWidget {
   HomeView({super.key});
 
   final globalKey = GlobalKey<FormState>();
 
+  final amountController = TextEditingController();
+  final descriptionController = TextEditingController();
+
+  //krishna0753
+  // Future<void> saveData(BuildContext contextData) async {
+  //   FirebaseFirestore db = FirebaseFirestore.instance;
+  //   db
+  //       .collection("users")
+  //       .doc('krishna0753')
+  //       .collection("expense")
+  //       .add({
+  //         "amount": 200,
+  //         "description": "first Coffie",
+  //         "date": DateTime.now(),
+  //         "createdAt": FieldValue.serverTimestamp(),
+  //       })
+  //       .then((cur) {
+  //         print("SucessMapla");
+  //         return ScaffoldMessenger.of(
+  //           contextData,
+  //         ).showSnackBar(SnackBar(content: Text("Successfully Added")));
+  //       })
+  //       .catchError((e) {
+  //         print("Error Mame...$e");
+  //       });
+  // }
+
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
-    final dateNotifierUi=ref.watch(monthProvider);
-    final dateNotifierRead=ref.read(monthProvider.notifier);
+  Widget build(BuildContext context, WidgetRef ref) {
+    //month providers
+    final monthNotifierUi = ref.watch(monthProvider);
+    final monthNotifierRead = ref.read(monthProvider.notifier);
+
+    //date providers
+    final dateNotifierUi = ref.watch(dateProvider);
+    final dateNotifierRead = ref.read(dateProvider.notifier);
+
+    //save providers
+    final saveNotifierUi = ref.watch(saveExpenseNotifier);
+    final saveNotifierRead = ref.read(saveExpenseNotifier.notifier);
+
+    //getExpense provider
+    final getExpenseProviderUi=ref.watch(getExpenseNotifier);
+    final getExpenseProviderRead=ref.read(getExpenseNotifier.notifier);
+
+
+    ref.listen(saveExpenseNotifier, (prev, next) {
+      next.whenOrNull(
+        data: (data) {
+          if (data) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("SuccessFully Added")));
+ref.refresh(getExpenseNotifier);
+            print("Success Mapla");
+          }
+        },
+      );
+    });
 
     double screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+    return BaseScaffold(
       appBar: AppBar(
-        
+        surfaceTintColor: Colors.transparent,
         title: Text("Dashboard", style: TextStyle(fontWeight: FontWeight.bold)),
       ),
-
       body: SingleChildScrollView(
         child: Center(
-          child: Column(
+          child: getExpenseProviderUi.when(data: (data){
+            return Column(
             children: [
               SizedBox(height: 10),
               Container(
                 height: 150,
                 width: screenWidth / 1.1,
-        
+
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(left: 30),
                 decoration: BoxDecoration(
@@ -46,13 +105,28 @@ class HomeView extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        final _selectedMOnth =
+                            await DateMonthPiker.getMonthPicker(
+                              context: context,
+                              initialDate: monthNotifierRead.state,
+                            );
+
+                        if (_selectedMOnth != null) {
+                        
+                          monthNotifierRead.state = _selectedMOnth;
+                            print("Mapla :${monthNotifierRead.state.lastDayOfMonth()!.day}");
+                        }
+                      },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: [
+                        children: [ 
                           Text(
-                            DateFormat('dd MMM').format(dateNotifierUi),
-                            style: TextStyle(fontSize: 15, color: Colors.white),
+                            DateFormat('MMM yyyy').format(monthNotifierUi),
+                            style: TextStyle(
+                              fontSize: Responsive.isMopile(context) ? 15 : 17,
+                              color: Colors.white,
+                            ),
                           ),
                           SizedBox(width: 10),
                           Icon(Icons.arrow_drop_down, color: Colors.white),
@@ -62,7 +136,10 @@ class HomeView extends ConsumerWidget {
                     SizedBox(height: 10),
                     Text(
                       "₹25000",
-                      style: TextStyle(fontSize: 35, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: Responsive.isMopile(context) ? 35 : 37,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
@@ -75,7 +152,10 @@ class HomeView extends ConsumerWidget {
                   children: [
                     Text(
                       "All Expense",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: Responsive.isMopile(context) ? 16 : 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -89,7 +169,7 @@ class HomeView extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: 10),
-              ...[1, 2, 3, 4, 5, 7].map((cur) {
+              ...data.map((cur) {
                 return Container(
                   width: screenWidth / 1.1,
                   margin: EdgeInsets.symmetric(vertical: 10),
@@ -103,7 +183,7 @@ class HomeView extends ConsumerWidget {
                       ),
                     ],
                   ),
-        
+
                   child: Card(
                     elevation: 0,
                     color: Colors.white,
@@ -123,11 +203,18 @@ class HomeView extends ConsumerWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("coofie", style: TextStyle(fontSize: 15)),
+                              Text(
+                                "coofie",
+                                style: TextStyle(
+                                  fontSize:
+                                      Responsive.isMopile(context) ? 15 : 17,
+                                ),
+                              ),
                               Text(
                                 "12 Mar 2026 05:30 PM",
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize:
+                                      Responsive.isMopile(context) ? 12 : 14,
                                   color: Colors.grey.shade500,
                                 ),
                               ),
@@ -136,7 +223,7 @@ class HomeView extends ConsumerWidget {
                           Text(
                             "₹25",
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: Responsive.isMopile(context) ? 15 : 17,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -147,7 +234,10 @@ class HomeView extends ConsumerWidget {
                 );
               }),
             ],
-          ),
+          );
+          }, error: (e,s)=>Text("$e"), loading: ()=>Center(
+            heightFactor: 10,
+            child: CircularProgressIndicator()))
         ),
       ),
 
@@ -182,7 +272,7 @@ class HomeView extends ConsumerWidget {
                         Text(
                           "Add Expense",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: Responsive.isMopile(context) ? 18 : 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -190,7 +280,7 @@ class HomeView extends ConsumerWidget {
                         Text(
                           "Enter your expense details",
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: Responsive.isMopile(context) ? 15 : 17,
                             color: Colors.grey.shade500,
                           ),
                         ),
@@ -198,6 +288,7 @@ class HomeView extends ConsumerWidget {
                         SizedBox(
                           width: screenWidth / 1.1,
                           child: CustomTextField(
+                            controller: amountController,
                             iconData: Icons.currency_rupee,
                             title: "Amount",
                             keyBoardType: TextInputType.number,
@@ -207,6 +298,7 @@ class HomeView extends ConsumerWidget {
                         SizedBox(
                           width: screenWidth / 1.1,
                           child: CustomTextField(
+                            controller: descriptionController,
                             iconData: Icons.note_alt_outlined,
                             title: "description",
                             keyBoardType: TextInputType.text,
@@ -223,19 +315,35 @@ class HomeView extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Color(0xFFE5E7EB)),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.date_range),
-                                  SizedBox(width: 13,),
-                                  Text("22-03-2026"),
-                                ],
-                              ),
-                              Icon(Icons.arrow_drop_down),
-                            ],
+                          child: InkWell(
+                            onTap: () async {
+                              final _selectedDate =
+                                  await DateMonthPiker.getDatePicker(
+                                    context: context,
+                                    initialDate: dateNotifierRead.state,
+                                  );
+                              if (_selectedDate != null) {
+                                dateNotifierRead.state = _selectedDate;
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.date_range),
+                                    SizedBox(width: 13),
+                                    Text(
+                                      DateFormat(
+                                        'dd-MM-yyyy',
+                                      ).format(dateNotifierUi),
+                                    ),
+                                  ],
+                                ),
+                                Icon(Icons.arrow_drop_down),
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(height: 15),
@@ -258,15 +366,35 @@ class HomeView extends ConsumerWidget {
                             ),
                             onPressed: () {
                               if (globalKey.currentState!.validate()) {
-                                print("Suucess Mame");
+                                saveNotifierRead.loadSaveData(
+                                  amount: int.parse(amountController.text),
+                                  description: descriptionController.text,
+                                );
                               }
                             },
-                            child: Text(
-                              "SUBMIT",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
+                            child: saveNotifierUi.when(
+                              data: (data) {
+                                return Text(
+                                  "SUBMIT",
+                                  style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMopile(context) ? 16 : 18,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
+                              error:
+                                  (e, s) => SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                              loading:
+                                  () => SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(),
+                                  ),
                             ),
                           ),
                         ),
