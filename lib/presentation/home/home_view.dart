@@ -1,144 +1,153 @@
 import 'package:expense_tracker/constant/app_colors.dart';
+import 'package:expense_tracker/presentation/home/home_viewmodel.dart';
 import 'package:expense_tracker/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
-class Home extends StatelessWidget {
-  Home({super.key});
+class HomeView extends ConsumerWidget {
+  HomeView({super.key});
 
   final globalKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
+    final dateNotifierUi=ref.watch(monthProvider);
+    final dateNotifierRead=ref.read(monthProvider.notifier);
+
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
+        
         title: Text("Dashboard", style: TextStyle(fontWeight: FontWeight.bold)),
       ),
 
-      body: Center(
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            Container(
-              height: 150,
-              width: screenWidth / 1.1,
-
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(left: 30),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF2B2B2B), Color(0xFF000000)],
-                ),
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: () {},
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "March 2026",
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
-                        SizedBox(width: 10),
-                        Icon(Icons.arrow_drop_down, color: Colors.white),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "₹25000",
-                    style: TextStyle(fontSize: 35, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: screenWidth / 1.1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "All Expense",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.all(8),
-                    child: Text("View All"),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            ...[1, 2, 3, 4, 5, 7].map((cur) {
-              return Container(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              Container(
+                height: 150,
                 width: screenWidth / 1.1,
-                margin: EdgeInsets.symmetric(vertical: 10),
+        
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(left: 30),
                 decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      spreadRadius: 0,
-                      blurRadius: 4,
-                      offset: Offset(0, 4),
-                      color: Colors.black.withOpacity(0.05),
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF2B2B2B), Color(0xFF000000)],
+                  ),
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () {},
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            DateFormat('dd MMM').format(dateNotifierUi),
+                            style: TextStyle(fontSize: 15, color: Colors.white),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(Icons.arrow_drop_down, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "₹25000",
+                      style: TextStyle(fontSize: 35, color: Colors.white),
                     ),
                   ],
                 ),
-
-                child: Card(
-                  elevation: 0,
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 10,
+              ),
+              SizedBox(height: 10),
+              SizedBox(
+                width: screenWidth / 1.1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "All Expense",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: AppColors.backgroundColor,
-                          child: Icon(Icons.trending_down),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("coofie", style: TextStyle(fontSize: 15)),
-                            Text(
-                              "12 Mar 2026 05:30 PM",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade500,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          "₹25",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.all(8),
+                      child: Text("View All"),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              ...[1, 2, 3, 4, 5, 7].map((cur) {
+                return Container(
+                  width: screenWidth / 1.1,
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        spreadRadius: 0,
+                        blurRadius: 4,
+                        offset: Offset(0, 4),
+                        color: Colors.black.withOpacity(0.05),
+                      ),
+                    ],
+                  ),
+        
+                  child: Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            backgroundColor: AppColors.backgroundColor,
+                            child: Icon(Icons.trending_down),
                           ),
-                        ),
-                      ],
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("coofie", style: TextStyle(fontSize: 15)),
+                              Text(
+                                "12 Mar 2026 05:30 PM",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            "₹25",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
-          ],
+                );
+              }),
+            ],
+          ),
         ),
       ),
 
@@ -233,6 +242,7 @@ class Home extends StatelessWidget {
 
                         Container(
                           width: screenWidth / 1.1,
+                          height: 50,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             gradient: LinearGradient(
