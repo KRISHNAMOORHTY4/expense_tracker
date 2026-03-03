@@ -56,9 +56,8 @@ class HomeView extends ConsumerWidget {
     final saveNotifierRead = ref.read(saveExpenseNotifier.notifier);
 
     //getExpense provider
-    final getExpenseProviderUi=ref.watch(getExpenseNotifier);
-    final getExpenseProviderRead=ref.read(getExpenseNotifier.notifier);
-
+    final getExpenseProviderUi = ref.watch(getExpenseNotifier);
+    final getExpenseProviderRead = ref.read(getExpenseNotifier.notifier);
 
     ref.listen(saveExpenseNotifier, (prev, next) {
       next.whenOrNull(
@@ -68,7 +67,7 @@ class HomeView extends ConsumerWidget {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text("SuccessFully Added")));
-ref.refresh(getExpenseNotifier);
+            ref.refresh(getExpenseNotifier);
             print("Success Mapla");
           }
         },
@@ -83,161 +82,174 @@ ref.refresh(getExpenseNotifier);
       ),
       body: SingleChildScrollView(
         child: Center(
-          child: getExpenseProviderUi.when(data: (data){
-            return Column(
-            children: [
-              SizedBox(height: 10),
-              Container(
-                height: 150,
-                width: screenWidth / 1.1,
+          child: getExpenseProviderUi.when(
+            data: (data) {
+              return Column(
+                children: [
+                  SizedBox(height: 10),
+                  Container(
+                    height: 150,
+                    width: screenWidth / 1.1,
 
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(left: 30),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF2B2B2B), Color(0xFF000000)],
-                  ),
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () async {
-                        final _selectedMOnth =
-                            await DateMonthPiker.getMonthPicker(
-                              context: context,
-                              initialDate: monthNotifierRead.state,
-                            );
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(left: 30),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF2B2B2B), Color(0xFF000000)],
+                      ),
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            final _selectedMOnth =
+                                await DateMonthPiker.getMonthPicker(
+                                  context: context,
+                                  initialDate: monthNotifierRead.state,
+                                );
 
-                        if (_selectedMOnth != null) {
-                        
-                          monthNotifierRead.state = _selectedMOnth;
-                            print("Mapla :${monthNotifierRead.state.lastDayOfMonth()!.day}");
-                        }
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [ 
-                          Text(
-                            DateFormat('MMM yyyy').format(monthNotifierUi),
-                            style: TextStyle(
-                              fontSize: Responsive.isMopile(context) ? 15 : 17,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Icon(Icons.arrow_drop_down, color: Colors.white),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "₹25000",
-                      style: TextStyle(
-                        fontSize: Responsive.isMopile(context) ? 35 : 37,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              SizedBox(
-                width: screenWidth / 1.1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "All Expense",
-                      style: TextStyle(
-                        fontSize: Responsive.isMopile(context) ? 16 : 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.all(8),
-                      child: Text("View All"),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              ...data.map((cur) {
-                return Container(
-                  width: screenWidth / 1.1,
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        spreadRadius: 0,
-                        blurRadius: 4,
-                        offset: Offset(0, 4),
-                        color: Colors.black.withOpacity(0.05),
-                      ),
-                    ],
-                  ),
-
-                  child: Card(
-                    elevation: 0,
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundColor: AppColors.backgroundColor,
-                            child: Icon(Icons.trending_down),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            if (_selectedMOnth != null) {
+                              monthNotifierRead.state = _selectedMOnth;
+                              print(
+                                "Mapla :${monthNotifierRead.state.lastDayOfMonth()!.day}",
+                              );
+                            }
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                "coofie",
+                                DateFormat('MMM yyyy').format(monthNotifierUi),
                                 style: TextStyle(
                                   fontSize:
                                       Responsive.isMopile(context) ? 15 : 17,
+                                  color: Colors.white,
                                 ),
                               ),
+                              SizedBox(width: 10),
+                              Icon(Icons.arrow_drop_down, color: Colors.white),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          "₹25000",
+                          style: TextStyle(
+                            fontSize: Responsive.isMopile(context) ? 35 : 37,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: screenWidth / 1.1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "All Expense",
+                          style: TextStyle(
+                            fontSize: Responsive.isMopile(context) ? 16 : 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.all(8),
+                          child: Text("View All"),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ...data.map((cur) {
+                    return Container(
+                      width: screenWidth / 1.1,
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            spreadRadius: 0,
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                            color: Colors.black.withOpacity(0.05),
+                          ),
+                        ],
+                      ),
+
+                      child: Card(
+                        elevation: 0,
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CircleAvatar(
+                                radius: 25,
+                                backgroundColor: AppColors.backgroundColor,
+                                child: Icon(Icons.trending_down),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    cur.description,
+                                    style: TextStyle(
+                                      fontSize:
+                                          Responsive.isMopile(context)
+                                              ? 15
+                                              : 17,
+                                    ),
+                                  ),
+                                  Text(
+                                    DateFormat('dd MMM yyyy h:m a').format(cur.expenseDate),
+                                    style: TextStyle(
+                                      fontSize:
+                                          Responsive.isMopile(context)
+                                              ? 12
+                                              : 14,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
+                              ),
                               Text(
-                                "12 Mar 2026 05:30 PM",
+                                "₹${cur.amount}",
                                 style: TextStyle(
                                   fontSize:
-                                      Responsive.isMopile(context) ? 12 : 14,
-                                  color: Colors.grey.shade500,
+                                      Responsive.isMopile(context) ? 15 : 17,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
-                          Text(
-                            "₹25",
-                            style: TextStyle(
-                              fontSize: Responsive.isMopile(context) ? 15 : 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }),
-            ],
-          );
-          }, error: (e,s)=>Text("$e"), loading: ()=>Center(
-            heightFactor: 10,
-            child: CircularProgressIndicator()))
+                    );
+                  }),
+                ],
+              );
+            },
+            error: (e, s) => Text("$e"),
+            loading:
+                () => Center(
+                  heightFactor: 10,
+                  child: CircularProgressIndicator(),
+                ),
+          ),
         ),
       ),
 

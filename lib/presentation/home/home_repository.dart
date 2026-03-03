@@ -24,12 +24,8 @@ class HomeRepository {
     required DateTime selectedMonth,
   }) async {
     try {
-      final startDate = DateTime(selectedMonth.day, selectedMonth.month, 01);
-      final endDate = DateTime(
-        selectedMonth.lastDayOfMonth()!.day,
-        selectedMonth.month,
-        selectedMonth.year,
-      );
+      final startDate = DateTime(selectedMonth.year, selectedMonth.month, 01);
+      final endDate = DateTime(selectedMonth.year,selectedMonth.month+1,0);
       final FirebaseFirestore db = FirebaseFirestore.instance;
       final userId = AppUser.auth;
       QuerySnapshot getData =
@@ -37,17 +33,18 @@ class HomeRepository {
               .collection('users')
               .doc(userId)
               .collection('expense')
-              .where("expenseDate", isGreaterThanOrEqualTo: startDate)
-              // .where('expenseDate', isLessThanOrEqualTo: endDate)
+              .where("expenseDate", isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+               .where('expenseDate', isLessThanOrEqualTo: Timestamp.fromDate(endDate)).orderBy('expenseDate',descending: true)
               .get();
-
+      // print("MAPLA $endDate");
       return getData.docs
           .map((cur) {
-            print("VANTHA DATA ${cur}");
-            return  HomeModel.fromJson(cur as Map<String, dynamic>);
+            print("MAPLA ${cur.data()}");
+            return  HomeModel.fromJson(cur.data() as Map<String, dynamic>);
           })
           .toList();
     } catch (e) {
+      print("osd $e");
       throw Exception(e.toString());
     }
   }
