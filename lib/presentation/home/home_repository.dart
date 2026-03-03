@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constant/app_user.dart';
 import 'package:expense_tracker/presentation/home/home_model.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class HomeRepository {
   Future<bool> addExpense({required HomeModel homeModel}) async {
@@ -25,7 +24,7 @@ class HomeRepository {
   }) async {
     try {
       final startDate = DateTime(selectedMonth.year, selectedMonth.month, 01);
-      final endDate = DateTime(selectedMonth.year,selectedMonth.month+1,0);
+      final endDate = DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
       final FirebaseFirestore db = FirebaseFirestore.instance;
       final userId = AppUser.auth;
       QuerySnapshot getData =
@@ -33,18 +32,41 @@ class HomeRepository {
               .collection('users')
               .doc(userId)
               .collection('expense')
-              .where("expenseDate", isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
-               .where('expenseDate', isLessThanOrEqualTo: Timestamp.fromDate(endDate)).orderBy('expenseDate',descending: true)
+              .where(
+                "expenseDate",
+                isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+              )
+              .where(
+                'expenseDate',
+                isLessThanOrEqualTo: Timestamp.fromDate(endDate),
+              )
+              .orderBy('expenseDate', descending: true)
               .get();
-      // print("MAPLA $endDate");
-      return getData.docs
-          .map((cur) {
-            print("MAPLA ${cur.data()}");
-            return  HomeModel.fromJson(cur.data() as Map<String, dynamic>);
-          })
-          .toList();
+
+      return getData.docs.map((cur) {
+        return HomeModel.fromJson(
+          cur.data() as Map<String, dynamic>,
+          id: cur.id,
+        );
+      }).toList();
     } catch (e) {
       print("osd $e");
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<bool> updateExpense(HomeModel homemodel) async {
+    try {
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+      final userId = AppUser.auth;
+      await db
+          .collection('users')
+          .doc(userId)
+          .collection('expense')
+          .doc(homemodel.id)
+          .update(homemodel.toMap());
+      return true;
+    } catch (e) {
       throw Exception(e.toString());
     }
   }
