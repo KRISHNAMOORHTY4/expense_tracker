@@ -215,7 +215,9 @@ class HomeView extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    DateFormat('dd MMM yyyy h:m a').format(cur.expenseDate),
+                                    DateFormat(
+                                      'dd MMM yyyy h:m a',
+                                    ).format(cur.expenseDate),
                                     style: TextStyle(
                                       fontSize:
                                           Responsive.isMopile(context)
