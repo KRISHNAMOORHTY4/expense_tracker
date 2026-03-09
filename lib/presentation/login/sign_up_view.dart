@@ -13,8 +13,6 @@ class SignUpView extends ConsumerWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passWordController = TextEditingController();
 
-
-
   final globalKey = GlobalKey<FormState>();
 
   @override
@@ -61,7 +59,12 @@ class SignUpView extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Create your Account", style: TextStyle(fontSize: 17)),
+                Text(
+                  "Create your Account",
+                  style: TextStyle(
+                    fontSize: Responsive.isMopile(context) ? 17 : 19,
+                  ),
+                ),
                 SizedBox(height: 20),
                 CustomTextField(
                   title: "email",
@@ -82,7 +85,10 @@ class SignUpView extends ConsumerWidget {
                       Center(
                         child: Text(
                           errorDataUi,
-                          style: TextStyle(color: Colors.red, fontSize: 12),
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: Responsive.isMopile(context) ? 12 : 14,
+                          ),
                         ),
                       ),
                     ],

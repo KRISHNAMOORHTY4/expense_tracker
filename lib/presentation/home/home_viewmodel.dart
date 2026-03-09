@@ -21,7 +21,7 @@ class AddExpenseAsyncNotifier extends AsyncNotifier<bool> {
     required int amount,
     required String description,
   }) async {
-    state =const AsyncLoading();
+    state = const AsyncLoading();
     final selectedDate = ref.read(dateProvider);
     final service = ref.read(homeRepoProvider);
     state = await AsyncValue.guard(() async {
@@ -34,7 +34,7 @@ class AddExpenseAsyncNotifier extends AsyncNotifier<bool> {
         ),
       );
     });
-    ref.read(dateProvider.notifier).state=DateTime.now();
+    ref.read(dateProvider.notifier).state = DateTime.now();
   }
 }
 
@@ -95,18 +95,26 @@ class UpdateExpenseNotifier extends AsyncNotifier<bool> {
   }
 }
 
+final updateExpenseProvider =
+    AsyncNotifierProvider<UpdateExpenseNotifier, bool>(
+      UpdateExpenseNotifier.new,
+    );
 
-final updateExpenseProvider =AsyncNotifierProvider<UpdateExpenseNotifier,bool>(UpdateExpenseNotifier.new);
-
-class deleteNotifier extends AsyncNotifier<bool>{
+class DeleteNotifier extends AsyncNotifier<bool> {
   @override
   FutureOr<bool> build() {
-   return false;
+    return false;
   }
 
-  Future<void>loadDeleteData({required String id})async{
-
-    
+  Future<void> loadDeleteData({required String id}) async {
+    state = const AsyncLoading();
+    final service = ref.read(homeRepoProvider);
+    state = await AsyncValue.guard(() async {
+      return service.deleteData(id: id);
+    });
   }
-
 }
+
+final deleteProvider = AsyncNotifierProvider<DeleteNotifier, bool>(
+  DeleteNotifier.new,
+);

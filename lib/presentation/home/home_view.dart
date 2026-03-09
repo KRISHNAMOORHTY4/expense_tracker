@@ -5,6 +5,7 @@ import 'package:expense_tracker/utils/date_month_piker.dart';
 import 'package:expense_tracker/widgets/base_scaffold.dart';
 import 'package:expense_tracker/widgets/custom_buttons.dart';
 import 'package:expense_tracker/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -55,6 +56,19 @@ class HomeView extends ConsumerWidget {
     //getExpense provider
     final getExpenseProviderUi = ref.watch(getExpenseNotifier);
     final getExpenseProviderRead = ref.read(getExpenseNotifier.notifier);
+
+    //delete provider
+    final deleteProviderRead = ref.read(deleteProvider.notifier);
+
+    ref.listen(deleteProvider, (prev, next) {
+      next.whenOrNull(
+        data: (data) {
+          if (data) {
+            ref.refresh(getExpenseNotifier);
+          }
+        },
+      );
+    });
 
     ref.listen(saveExpenseNotifier, (prev, next) {
       next.whenOrNull(
@@ -188,71 +202,76 @@ class HomeView extends ConsumerWidget {
                       ),
                     ),
                   ...data.map((cur) {
-                    return Container(
-                      width: screenWidth / 1.1,
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            spreadRadius: 0,
-                            blurRadius: 4,
-                            offset: Offset(0, 4),
-                            color: Colors.black.withOpacity(0.05),
-                          ),
-                        ],
-                      ),
+                    return InkWell(
+                      onDoubleTap: () {
+                        deleteProviderRead.loadDeleteData(id: cur.id);
+                      },
+                      child: Container(
+                        width: screenWidth / 1.1,
+                        margin: EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              spreadRadius: 0,
+                              blurRadius: 4,
+                              offset: Offset(0, 4),
+                              color: Colors.black.withOpacity(0.05),
+                            ),
+                          ],
+                        ),
 
-                      child: Card(
-                        elevation: 0,
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 20,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CircleAvatar(
-                                radius: 25,
-                                backgroundColor: AppColors.backgroundColor,
-                                child: Icon(Icons.trending_down),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    cur.description,
-                                    style: TextStyle(
-                                      fontSize:
-                                          Responsive.isMopile(context)
-                                              ? 15
-                                              : 17,
-                                    ),
-                                  ),
-                                  Text(
-                                    DateFormat(
-                                      'dd MMM yyyy h:m a',
-                                    ).format(cur.expenseDate),
-                                    style: TextStyle(
-                                      fontSize:
-                                          Responsive.isMopile(context)
-                                              ? 12
-                                              : 14,
-                                      color: Colors.grey.shade500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "₹${cur.amount}",
-                                style: TextStyle(
-                                  fontSize:
-                                      Responsive.isMopile(context) ? 15 : 17,
-                                  fontWeight: FontWeight.bold,
+                        child: Card(
+                          elevation: 0,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: AppColors.backgroundColor,
+                                  child: Icon(Icons.trending_down),
                                 ),
-                              ),
-                            ],
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      cur.description,
+                                      style: TextStyle(
+                                        fontSize:
+                                            Responsive.isMopile(context)
+                                                ? 15
+                                                : 17,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat(
+                                        'dd MMM yyyy h:m a',
+                                      ).format(cur.expenseDate),
+                                      style: TextStyle(
+                                        fontSize:
+                                            Responsive.isMopile(context)
+                                                ? 12
+                                                : 14,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  "₹${cur.amount}",
+                                  style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMopile(context) ? 15 : 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -392,11 +411,20 @@ class HomeView extends ConsumerWidget {
                             CustomButtons(
                               title: "SUBMIT",
                               onPressed: () async {
-                                if (globalKey.currentState!.validate()) {
-                                  saveNotifierRead.loadSaveData(
-                                    amount: int.parse(amountController.text),
-                                    description: descriptionController.text,
-                                  );
+                                // if (globalKey.currentState!.validate()) {
+                                //   saveNotifierRead.loadSaveData(
+                                //     amount: int.parse(amountController.text),
+                                //     description: descriptionController.text,
+                                //   );
+                                // }
+                                try {
+                                  await FirebaseAuth.instance
+                                      .sendPasswordResetEmail(
+                                        email: "karnars200@gmail.com",
+                                      );
+                                  print("Success mapla");
+                                } catch (e) {
+                                  print("MPAL:ERROR>>>$e");
                                 }
                               },
                               isLoading: saveNotifierUi.when(
