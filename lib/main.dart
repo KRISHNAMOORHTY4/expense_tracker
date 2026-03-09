@@ -10,25 +10,36 @@ void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-   MyApp({super.key});
+  MyApp({super.key});
 
-  final user=FirebaseAuth.instance.currentUser;
 
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-      print("KRISH :$user");
+  
     return ProviderScope(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(fontFamily: "Poppins", textTheme: TextTheme()),
-        home: user==null ? SignUpView() : HomeView(),
+        home: StreamBuilder<User?>(stream: FirebaseAuth.instance.authStateChanges(), builder:(context,snapShot){
+
+          if(snapShot.connectionState==ConnectionState.waiting){
+            return Scaffold(
+              body:CircularProgressIndicator() ,
+            );
+          }else if(snapShot.hasData){
+             print(snapShot.data);
+            return HomeView();
+          }else{
+          return HomeView();
+          }
+        })
       ),
     );
   }

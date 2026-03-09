@@ -70,4 +70,22 @@ class HomeRepository {
       throw Exception(e.toString());
     }
   }
+
+  Future<bool> deleteData({required String id}) async {
+    try {
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+      final userId = AppUser.auth;
+
+      await db
+          .collection('users')
+          .doc(userId)
+          .collection('expense')
+          .doc(id)
+          .delete();
+
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }

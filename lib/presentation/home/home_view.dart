@@ -3,11 +3,12 @@ import 'package:expense_tracker/constant/responsive.dart';
 import 'package:expense_tracker/presentation/home/home_viewmodel.dart';
 import 'package:expense_tracker/utils/date_month_piker.dart';
 import 'package:expense_tracker/widgets/base_scaffold.dart';
+import 'package:expense_tracker/widgets/custom_buttons.dart';
 import 'package:expense_tracker/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class HomeView extends ConsumerWidget {
   HomeView({super.key});
@@ -48,12 +49,8 @@ class HomeView extends ConsumerWidget {
     final monthNotifierRead = ref.read(monthProvider.notifier);
 
     //date providers
-    final dateNotifierUi = ref.watch(dateProvider);
-    final dateNotifierRead = ref.read(dateProvider.notifier);
 
-    //save providers
-    final saveNotifierUi = ref.watch(saveExpenseNotifier);
-    final saveNotifierRead = ref.read(saveExpenseNotifier.notifier);
+    final dateNotifierRead = ref.read(dateProvider.notifier);
 
     //getExpense provider
     final getExpenseProviderUi = ref.watch(getExpenseNotifier);
@@ -64,11 +61,17 @@ class HomeView extends ConsumerWidget {
         data: (data) {
           if (data) {
             Navigator.pop(context);
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text("SuccessFully Added")));
+            amountController.text = '';
+            descriptionController.text = '';
+            Fluttertoast.showToast(
+              textColor: Colors.white,
+              gravity: ToastGravity.BOTTOM,
+              toastLength: Toast.LENGTH_SHORT,
+              msg: "Successfully Added",
+              backgroundColor: Colors.green,
+            );
+
             ref.refresh(getExpenseNotifier);
-            print("Success Mapla");
           }
         },
       );
@@ -84,6 +87,11 @@ class HomeView extends ConsumerWidget {
         child: Center(
           child: getExpenseProviderUi.when(
             data: (data) {
+              int totalAmount = 0;
+              for (var newData in data) {
+                totalAmount += newData.amount;
+              }
+
               return Column(
                 children: [
                   SizedBox(height: 10),
@@ -114,9 +122,7 @@ class HomeView extends ConsumerWidget {
 
                             if (_selectedMOnth != null) {
                               monthNotifierRead.state = _selectedMOnth;
-                              print(
-                                "Mapla :${monthNotifierRead.state.lastDayOfMonth()!.day}",
-                              );
+                              getExpenseProviderRead.loadGetData();
                             }
                           },
                           child: Row(
@@ -137,7 +143,7 @@ class HomeView extends ConsumerWidget {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "₹25000",
+                          "₹$totalAmount",
                           style: TextStyle(
                             fontSize: Responsive.isMopile(context) ? 35 : 37,
                             color: Colors.white,
@@ -171,6 +177,16 @@ class HomeView extends ConsumerWidget {
                     ),
                   ),
                   SizedBox(height: 10),
+                  if (data.isEmpty)
+                    Center(
+                      heightFactor: 10,
+                      child: Text(
+                        "No Data for this month",
+                        style: TextStyle(
+                          fontSize: Responsive.isMopile(context) ? 16 : 18,
+                        ),
+                      ),
+                    ),
                   ...data.map((cur) {
                     return Container(
                       width: screenWidth / 1.1,
@@ -268,153 +284,132 @@ class HomeView extends ConsumerWidget {
               backgroundColor: AppColors.backgroundColor,
               context: context,
               builder: (context) {
-                return Form(
-                  key: globalKey,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        SizedBox(height: 15),
-                        Container(
-                          height: 8,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade500,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        Text(
-                          "Add Expense",
-                          style: TextStyle(
-                            fontSize: Responsive.isMopile(context) ? 18 : 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          "Enter your expense details",
-                          style: TextStyle(
-                            fontSize: Responsive.isMopile(context) ? 15 : 17,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        SizedBox(
-                          width: screenWidth / 1.1,
-                          child: CustomTextField(
-                            controller: amountController,
-                            iconData: Icons.currency_rupee,
-                            title: "Amount",
-                            keyBoardType: TextInputType.number,
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        SizedBox(
-                          width: screenWidth / 1.1,
-                          child: CustomTextField(
-                            controller: descriptionController,
-                            iconData: Icons.note_alt_outlined,
-                            title: "description",
-                            keyBoardType: TextInputType.text,
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        Container(
-                          width: screenWidth / 1.1,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 15,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Color(0xFFE5E7EB)),
-                          ),
-                          child: InkWell(
-                            onTap: () async {
-                              final _selectedDate =
-                                  await DateMonthPiker.getDatePicker(
-                                    context: context,
-                                    initialDate: dateNotifierRead.state,
-                                  );
-                              if (_selectedDate != null) {
-                                dateNotifierRead.state = _selectedDate;
-                              }
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.date_range),
-                                    SizedBox(width: 13),
-                                    Text(
-                                      DateFormat(
-                                        'dd-MM-yyyy',
-                                      ).format(dateNotifierUi),
-                                    ),
-                                  ],
-                                ),
-                                Icon(Icons.arrow_drop_down),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 15),
-
-                        Container(
-                          width: screenWidth / 1.1,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF2B2B2B), Color(0xFF000000)],
-                            ),
-                          ),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                return Consumer(
+                  builder: (context, refData, child) {
+                    final dateNotifierUi = refData.watch(dateProvider);
+                    //save providers
+                    final saveNotifierUi = refData.watch(saveExpenseNotifier);
+                    final saveNotifierRead = refData.read(
+                      saveExpenseNotifier.notifier,
+                    );
+                    return Form(
+                      key: globalKey,
+                      child: Center(
+                        child: Column(
+                          children: [
+                            SizedBox(height: 15),
+                            Container(
+                              height: 8,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade500,
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            onPressed: () {
-                              if (globalKey.currentState!.validate()) {
-                                saveNotifierRead.loadSaveData(
-                                  amount: int.parse(amountController.text),
-                                  description: descriptionController.text,
-                                );
-                              }
-                            },
-                            child: saveNotifierUi.when(
-                              data: (data) {
-                                return Text(
-                                  "SUBMIT",
-                                  style: TextStyle(
-                                    fontSize:
-                                        Responsive.isMopile(context) ? 16 : 18,
-                                    color: Colors.white,
-                                  ),
-                                );
-                              },
-                              error:
-                                  (e, s) => SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(),
-                                  ),
-                              loading:
-                                  () => SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(),
-                                  ),
+                            SizedBox(height: 15),
+                            Text(
+                              "Add Expense",
+                              style: TextStyle(
+                                fontSize:
+                                    Responsive.isMopile(context) ? 18 : 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 10),
+                            Text(
+                              "Enter your expense details",
+                              style: TextStyle(
+                                fontSize:
+                                    Responsive.isMopile(context) ? 15 : 17,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            SizedBox(
+                              width: screenWidth / 1.1,
+                              child: CustomTextField(
+                                controller: amountController,
+                                iconData: Icons.currency_rupee,
+                                title: "Amount",
+                                keyBoardType: TextInputType.number,
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            SizedBox(
+                              width: screenWidth / 1.1,
+                              child: CustomTextField(
+                                controller: descriptionController,
+                                iconData: Icons.note_alt_outlined,
+                                title: "description",
+                                keyBoardType: TextInputType.text,
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            Container(
+                              width: screenWidth / 1.1,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 15,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Color(0xFFE5E7EB)),
+                              ),
+                              child: InkWell(
+                                onTap: () async {
+                                  final _selectedDate =
+                                      await DateMonthPiker.getDatePicker(
+                                        context: context,
+                                        initialDate: dateNotifierRead.state,
+                                      );
+                                  if (_selectedDate != null) {
+                                    dateNotifierRead.state = _selectedDate;
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.date_range),
+                                        SizedBox(width: 13),
+                                        Text(
+                                          DateFormat(
+                                            'dd-MM-yyyy',
+                                          ).format(dateNotifierUi),
+                                        ),
+                                      ],
+                                    ),
+                                    Icon(Icons.arrow_drop_down),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 15),
+
+                            CustomButtons(
+                              title: "SUBMIT",
+                              onPressed: () async {
+                                if (globalKey.currentState!.validate()) {
+                                  saveNotifierRead.loadSaveData(
+                                    amount: int.parse(amountController.text),
+                                    description: descriptionController.text,
+                                  );
+                                }
+                              },
+                              isLoading: saveNotifierUi.when(
+                                data: (data) => false,
+                                error: (e, s) => false,
+                                loading: () => true,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
             );
