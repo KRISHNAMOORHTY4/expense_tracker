@@ -96,6 +96,7 @@ class HomeView extends ConsumerWidget {
 
     double screenWidth = MediaQuery.of(context).size.width;
     return BaseScaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         title: Text("Dashboard", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -148,9 +149,8 @@ class HomeView extends ConsumerWidget {
                               Text(
                                 DateFormat('MMM yyyy').format(monthNotifierUi),
                                 style: TextStyle(
-                                  fontSize: Responsive.isMopile(context)
-                                      ? 15
-                                      : 17,
+                                  fontSize:
+                                      Responsive.isMopile(context) ? 15 : 17,
                                   color: Colors.white,
                                 ),
                               ),
@@ -267,9 +267,10 @@ class HomeView extends ConsumerWidget {
                                       Text(
                                         cur.description,
                                         style: TextStyle(
-                                          fontSize: Responsive.isMopile(context)
-                                              ? 15
-                                              : 17,
+                                          fontSize:
+                                              Responsive.isMopile(context)
+                                                  ? 15
+                                                  : 17,
                                         ),
                                       ),
                                       Text(
@@ -277,9 +278,10 @@ class HomeView extends ConsumerWidget {
                                           'dd MMM yyyy h:m a',
                                         ).format(cur.expenseDate),
                                         style: TextStyle(
-                                          fontSize: Responsive.isMopile(context)
-                                              ? 12
-                                              : 14,
+                                          fontSize:
+                                              Responsive.isMopile(context)
+                                                  ? 12
+                                                  : 14,
                                           color: Colors.grey.shade500,
                                         ),
                                       ),
@@ -288,9 +290,10 @@ class HomeView extends ConsumerWidget {
                                   Text(
                                     "₹${cur.amount}",
                                     style: TextStyle(
-                                      fontSize: Responsive.isMopile(context)
-                                          ? 15
-                                          : 17,
+                                      fontSize:
+                                          Responsive.isMopile(context)
+                                              ? 15
+                                              : 17,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -306,8 +309,11 @@ class HomeView extends ConsumerWidget {
               );
             },
             error: (e, s) => Text("$e"),
-            loading: () =>
-                Center(heightFactor: 10, child: CircularProgressIndicator()),
+            loading:
+                () => Center(
+                  heightFactor: 10,
+                  child: CircularProgressIndicator(),
+                ),
           ),
         ),
       ),
@@ -321,7 +327,7 @@ class HomeView extends ConsumerWidget {
           ),
           onPressed: () {
             showModalBottomSheet(
-              constraints: BoxConstraints(maxHeight: 450),
+              isScrollControlled: true,
               backgroundColor: AppColors.backgroundColor,
               context: context,
               builder: (context) {
@@ -333,122 +339,130 @@ class HomeView extends ConsumerWidget {
                     final saveNotifierRead = refData.read(
                       saveExpenseNotifier.notifier,
                     );
-                    return Form(
-                      key: globalKey,
-                      child: Center(
-                        child: Column(
-                          children: [
-                            SizedBox(height: 15),
-                            Container(
-                              height: 8,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade500,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            SizedBox(height: 15),
-                            Text(
-                              "Add Expense",
-                              style: TextStyle(
-                                fontSize: Responsive.isMopile(context)
-                                    ? 18
-                                    : 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              "Enter your expense details",
-                              style: TextStyle(
-                                fontSize: Responsive.isMopile(context)
-                                    ? 15
-                                    : 17,
-                                color: Colors.grey.shade500,
-                              ),
-                            ),
-                            SizedBox(height: 15),
-                            SizedBox(
-                              width: screenWidth / 1.1,
-                              child: CustomTextField(
-                                controller: amountController,
-                                iconData: Icons.currency_rupee,
-                                title: "Amount",
-                                keyBoardType: TextInputType.number,
-                              ),
-                            ),
-                            SizedBox(height: 15),
-                            SizedBox(
-                              width: screenWidth / 1.1,
-                              child: CustomTextField(
-                                controller: descriptionController,
-                                iconData: Icons.note_alt_outlined,
-                                title: "description",
-                                keyBoardType: TextInputType.text,
-                              ),
-                            ),
-                            SizedBox(height: 15),
-                            Container(
-                              width: screenWidth / 1.1,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 15,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Color(0xFFE5E7EB)),
-                              ),
-                              child: InkWell(
-                                onTap: () async {
-                                  final _selectedDate =
-                                      await DateMonthPiker.getDatePicker(
-                                        context: context,
-                                        initialDate: dateNotifierRead.state,
-                                      );
-                                  if (_selectedDate != null) {
-                                    dateNotifierRead.state = _selectedDate;
-                                  }
-                                },
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.date_range),
-                                        SizedBox(width: 13),
-                                        Text(
-                                          DateFormat(
-                                            'dd-MM-yyyy',
-                                          ).format(dateNotifierUi),
-                                        ),
-                                      ],
-                                    ),
-                                    Icon(Icons.arrow_drop_down),
-                                  ],
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom:
+                            MediaQuery.of(
+                              context,
+                            ).viewInsets.bottom, // keyboard height adjust
+                      ),
+                      child: Form(
+                        key: globalKey,
+                        child: Container(
+                          width: screenWidth,
+                          height: 450,
+                          child: Column(
+                            children: [
+                              SizedBox(height: 15),
+                              Container(
+                                height: 8,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade500,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 15),
-
-                            CustomButtons(
-                              title: "SUBMIT",
-                              onPressed: () async {
-                                if (globalKey.currentState!.validate()) {
-                                  saveNotifierRead.loadSaveData(
-                                    amount: int.parse(amountController.text),
-                                    description: descriptionController.text,
-                                  );
-                                }
-                              },
-                              isLoading: saveNotifierUi.when(
-                                data: (data) => false,
-                                error: (e, s) => false,
-                                loading: () => true,
+                              SizedBox(height: 15),
+                              Text(
+                                "Add Expense",
+                                style: TextStyle(
+                                  fontSize:
+                                      Responsive.isMopile(context) ? 18 : 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 10),
+                              Text(
+                                "Enter your expense details",
+                                style: TextStyle(
+                                  fontSize:
+                                      Responsive.isMopile(context) ? 15 : 17,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                              SizedBox(height: 15),
+                              SizedBox(
+                                width: screenWidth / 1.1,
+                                child: CustomTextField(
+                                  controller: amountController,
+                                  iconData: Icons.currency_rupee,
+                                  title: "Amount",
+                                  keyBoardType: TextInputType.number,
+                                ),
+                              ),
+                              SizedBox(height: 15),
+                              SizedBox(
+                                width: screenWidth / 1.1,
+                                child: CustomTextField(
+                                  controller: descriptionController,
+                                  iconData: Icons.note_alt_outlined,
+                                  title: "description",
+                                  keyBoardType: TextInputType.text,
+                                ),
+                              ),
+                              SizedBox(height: 15),
+                              Container(
+                                width: screenWidth / 1.1,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 15,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Color(0xFFE5E7EB)),
+                                ),
+                                child: InkWell(
+                                  onTap: () async {
+                                    final _selectedDate =
+                                        await DateMonthPiker.getDatePicker(
+                                          context: context,
+                                          initialDate: dateNotifierRead.state,
+                                        );
+                                    if (_selectedDate != null) {
+                                      dateNotifierRead.state = _selectedDate;
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.date_range),
+                                          SizedBox(width: 13),
+                                          Text(
+                                            DateFormat(
+                                              'dd-MM-yyyy',
+                                            ).format(dateNotifierUi),
+                                          ),
+                                        ],
+                                      ),
+                                      Icon(Icons.arrow_drop_down),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 15),
+
+                              CustomButtons(
+                                title: "SUBMIT",
+                                onPressed: () async {
+                                  if (globalKey.currentState!.validate()) {
+                                    saveNotifierRead.loadSaveData(
+                                      amount: int.parse(amountController.text),
+                                      description: descriptionController.text,
+                                    );
+                                  }
+                                },
+                                isLoading: saveNotifierUi.when(
+                                  data: (data) => false,
+                                  error: (e, s) => false,
+                                  loading: () => true,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );

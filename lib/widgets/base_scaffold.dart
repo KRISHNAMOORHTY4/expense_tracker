@@ -5,11 +5,13 @@ class BaseScaffold extends StatelessWidget {
   final PreferredSizeWidget ? appBar;
   final Widget body;
   final Widget ? floatingActionButton;
-  const BaseScaffold({super.key,  this.appBar, required this.body, this.floatingActionButton});
+  final bool ? resizeToAvoidBottomInset;
+  const BaseScaffold( {super.key,  this.appBar, required this.body, this.floatingActionButton,this.resizeToAvoidBottomInset,});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: resizeToAvoidBottomInset ?? false,
       backgroundColor: AppColors.backgroundColor,
       appBar:appBar ,
       body: SafeArea(child: body),

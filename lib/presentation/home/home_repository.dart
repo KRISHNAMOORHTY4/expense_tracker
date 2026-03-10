@@ -6,7 +6,7 @@ class HomeRepository {
   Future<bool> addExpense({required HomeModel homeModel}) async {
     try {
       final FirebaseFirestore db = FirebaseFirestore.instance;
-      final userId = AppUser.auth;
+      final userId = AppUser().auth;
       await db
           .collection('users')
           .doc(userId)
@@ -26,7 +26,7 @@ class HomeRepository {
       final startDate = DateTime(selectedMonth.year, selectedMonth.month, 01);
       final endDate = DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
       final FirebaseFirestore db = FirebaseFirestore.instance;
-      final userId = AppUser.auth;
+      final userId = AppUser().auth;
       QuerySnapshot getData =
           await db
               .collection('users')
@@ -58,7 +58,7 @@ class HomeRepository {
   Future<bool> updateExpense(HomeModel homemodel) async {
     try {
       final FirebaseFirestore db = FirebaseFirestore.instance;
-      final userId = AppUser.auth;
+      final userId = AppUser().auth;
       await db
           .collection('users')
           .doc(userId)
@@ -74,7 +74,7 @@ class HomeRepository {
   Future<bool> deleteData({required String id}) async {
     try {
       final FirebaseFirestore db = FirebaseFirestore.instance;
-      final userId = AppUser.auth;
+      final userId = AppUser().auth;
 
       await db
           .collection('users')
