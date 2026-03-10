@@ -148,8 +148,9 @@ class HomeView extends ConsumerWidget {
                               Text(
                                 DateFormat('MMM yyyy').format(monthNotifierUi),
                                 style: TextStyle(
-                                  fontSize:
-                                      Responsive.isMopile(context) ? 15 : 17,
+                                  fontSize: Responsive.isMopile(context)
+                                      ? 15
+                                      : 17,
                                   color: Colors.white,
                                 ),
                               ),
@@ -207,7 +208,7 @@ class HomeView extends ConsumerWidget {
                   ...data.map((cur) {
                     return SlidableAutoCloseBehavior(
                       closeWhenOpened: true,
-              
+
                       child: Slidable(
                         key: ValueKey(cur.id.toString()),
                         endActionPane: ActionPane(
@@ -218,20 +219,22 @@ class HomeView extends ConsumerWidget {
                               backgroundColor: Colors.transparent,
                               foregroundColor: Colors.black,
                               onPressed: (context) {
-                                 deleteProviderRead.loadDeleteData(id: cur.id);
+                                deleteProviderRead.loadDeleteData(id: cur.id);
                               },
                               label: "delete",
                               icon: Icons.delete,
-                              
                             ),
                           ],
                         ),
                         child: Container(
                           width: double.infinity,
-                          margin: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                          margin: EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 10,
+                          ),
                           decoration: BoxDecoration(
                             boxShadow: [
-                              BoxShadow( 
+                              BoxShadow(
                                 spreadRadius: 0,
                                 blurRadius: 4,
                                 offset: Offset(0, 4),
@@ -239,7 +242,7 @@ class HomeView extends ConsumerWidget {
                               ),
                             ],
                           ),
-                      
+
                           child: Card(
                             elevation: 0,
                             color: Colors.white,
@@ -264,10 +267,9 @@ class HomeView extends ConsumerWidget {
                                       Text(
                                         cur.description,
                                         style: TextStyle(
-                                          fontSize:
-                                              Responsive.isMopile(context)
-                                                  ? 15
-                                                  : 17,
+                                          fontSize: Responsive.isMopile(context)
+                                              ? 15
+                                              : 17,
                                         ),
                                       ),
                                       Text(
@@ -275,10 +277,9 @@ class HomeView extends ConsumerWidget {
                                           'dd MMM yyyy h:m a',
                                         ).format(cur.expenseDate),
                                         style: TextStyle(
-                                          fontSize:
-                                              Responsive.isMopile(context)
-                                                  ? 12
-                                                  : 14,
+                                          fontSize: Responsive.isMopile(context)
+                                              ? 12
+                                              : 14,
                                           color: Colors.grey.shade500,
                                         ),
                                       ),
@@ -287,10 +288,9 @@ class HomeView extends ConsumerWidget {
                                   Text(
                                     "₹${cur.amount}",
                                     style: TextStyle(
-                                      fontSize:
-                                          Responsive.isMopile(context)
-                                              ? 15
-                                              : 17,
+                                      fontSize: Responsive.isMopile(context)
+                                          ? 15
+                                          : 17,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -306,11 +306,8 @@ class HomeView extends ConsumerWidget {
               );
             },
             error: (e, s) => Text("$e"),
-            loading:
-                () => Center(
-                  heightFactor: 10,
-                  child: CircularProgressIndicator(),
-                ),
+            loading: () =>
+                Center(heightFactor: 10, child: CircularProgressIndicator()),
           ),
         ),
       ),
@@ -354,8 +351,9 @@ class HomeView extends ConsumerWidget {
                             Text(
                               "Add Expense",
                               style: TextStyle(
-                                fontSize:
-                                    Responsive.isMopile(context) ? 18 : 20,
+                                fontSize: Responsive.isMopile(context)
+                                    ? 18
+                                    : 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -363,8 +361,9 @@ class HomeView extends ConsumerWidget {
                             Text(
                               "Enter your expense details",
                               style: TextStyle(
-                                fontSize:
-                                    Responsive.isMopile(context) ? 15 : 17,
+                                fontSize: Responsive.isMopile(context)
+                                    ? 15
+                                    : 17,
                                 color: Colors.grey.shade500,
                               ),
                             ),
@@ -442,8 +441,7 @@ class HomeView extends ConsumerWidget {
                                     description: descriptionController.text,
                                   );
                                 }
-                           
-                              },  
+                              },
                               isLoading: saveNotifierUi.when(
                                 data: (data) => false,
                                 error: (e, s) => false,

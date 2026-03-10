@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
              print(snapShot.data);
             return HomeView();
           }else{
-          return HomeView();
+          return SignUpView();
           }
         })
       ),
