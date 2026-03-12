@@ -1,5 +1,6 @@
 import 'package:expense_tracker/constant/responsive.dart';
 import 'package:expense_tracker/presentation/login/sign_up_viewmodel.dart';
+import 'package:expense_tracker/utils/custom_flutter_toast.dart';
 import 'package:expense_tracker/widgets/base_scaffold.dart';
 import 'package:expense_tracker/widgets/custom_buttons.dart';
 import 'package:expense_tracker/widgets/custom_text_field.dart';
@@ -132,12 +133,31 @@ class SignUpView extends ConsumerWidget {
                       child: otherSign(
                         IconData: FontAwesomeIcons.google,
                         onPressed: () async {
-                          final FirebaseAuth auth = FirebaseAuth.instance;
+                          try {
+                            final FirebaseAuth auth = FirebaseAuth.instance;
+                            GoogleSignInAccount? selectedAccount =
+                                await GoogleSignIn().signIn();
 
-                          // Flutter web: use Firebase Auth popup
-                          final GoogleAuthProvider googleProvider =
-                              GoogleAuthProvider();
-                          await auth.signInWithPopup(googleProvider);
+                            if (selectedAccount == null) {
+                              print("No account");
+                              return;
+                            }
+                            final getAccountData =
+                                await selectedAccount.authentication;
+
+                            final goggleAuthProvider =
+                                GoogleAuthProvider.credential(
+                                  idToken: getAccountData.idToken,
+                                  accessToken: getAccountData.accessToken,
+                                );
+
+                            await auth.signInWithCredential(goggleAuthProvider);
+                            CustomFlutterToast.toast(
+                              content: "Login successfully",
+                            );
+                          } catch (e) {
+                            print("ERROR:$e");
+                          }
                         },
                       ),
                     ),
