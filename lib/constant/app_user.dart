@@ -1,4 +1,6 @@
-class AppUser {
+import 'package:firebase_auth/firebase_auth.dart';
 
- static String auth="krishna0753";
+class AppUser {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  String get auth => currentUser?.email ?? 'krishna';
 }

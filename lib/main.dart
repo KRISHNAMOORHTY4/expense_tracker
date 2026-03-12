@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
     return ProviderScope(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
         theme: ThemeData(fontFamily: "Poppins", textTheme: TextTheme()),
         home: StreamBuilder<User?>(stream: FirebaseAuth.instance.authStateChanges(), builder:(context,snapShot){
 
@@ -37,7 +36,7 @@ class MyApp extends StatelessWidget {
              print(snapShot.data);
             return HomeView();
           }else{
-          return HomeView();
+          return SignUpView();
           }
         })
       ),

@@ -3,9 +3,12 @@ import 'package:expense_tracker/presentation/login/sign_up_viewmodel.dart';
 import 'package:expense_tracker/widgets/base_scaffold.dart';
 import 'package:expense_tracker/widgets/custom_buttons.dart';
 import 'package:expense_tracker/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignUpView extends ConsumerWidget {
   SignUpView({super.key});
@@ -17,7 +20,10 @@ class SignUpView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Widget otherSign({required IconData IconData}) {
+    Widget otherSign({
+      required IconData IconData,
+      required VoidCallback onPressed,
+    }) {
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -33,7 +39,7 @@ class SignUpView extends ConsumerWidget {
         height: 60,
 
         child: Center(
-          child: IconButton(onPressed: () {}, icon: Icon(IconData)),
+          child: IconButton(onPressed: onPressed, icon: Icon(IconData)),
         ),
       );
     }
@@ -116,15 +122,31 @@ class SignUpView extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: otherSign(IconData: FontAwesomeIcons.facebook),
+                      child: otherSign(
+                        IconData: FontAwesomeIcons.facebook,
+                        onPressed: () {},
+                      ),
                     ),
                     SizedBox(width: 20),
                     Expanded(
-                      child: otherSign(IconData: FontAwesomeIcons.google),
+                      child: otherSign(
+                        IconData: FontAwesomeIcons.google,
+                        onPressed: () async {
+                          final FirebaseAuth auth = FirebaseAuth.instance;
+
+                          // Flutter web: use Firebase Auth popup
+                          final GoogleAuthProvider googleProvider =
+                              GoogleAuthProvider();
+                          await auth.signInWithPopup(googleProvider);
+                        },
+                      ),
                     ),
                     SizedBox(width: 20),
                     Expanded(
-                      child: otherSign(IconData: FontAwesomeIcons.twitter),
+                      child: otherSign(
+                        IconData: FontAwesomeIcons.twitter,
+                        onPressed: () {},
+                      ),
                     ),
                   ],
                 ),
